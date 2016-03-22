@@ -15,7 +15,10 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     @IBOutlet weak var myCellTypePicker: StringPicker!
     @IBOutlet weak var mySearchTypePicker: StringPicker!
     
+    var timer : NSTimer!
+    
     @IBAction func resetButton(sender: UIButton) {
+        timer.invalidate()
         myGraph.resetCellStates()
         myCollectionView.reloadData()
         myCollectionView.userInteractionEnabled = true
@@ -23,7 +26,16 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     @IBAction func executeButton(sender: UIButton) {
         myCollectionView.userInteractionEnabled = false
-        myGraph.executeBFS()
+        timer = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("execute"), userInfo: nil, repeats: true)
+        timer.fire()
+    }
+    
+    func execute() {
+        let done = myGraph.executeAStar()
+        if done {
+            timer.invalidate()
+            NSLog("true")
+        }
         myCollectionView.reloadData()
     }
     

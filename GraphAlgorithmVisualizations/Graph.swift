@@ -27,6 +27,9 @@ enum CellType: String {
 struct CellState {
     var visitedState : CellVisitedState
     var distance : Double
+    var g: Double
+    var h: Double
+    var gPath: [NodeLocation] = []
     var parentNode : NodeLocation?
 }
 
@@ -47,6 +50,22 @@ struct GraphNode {
 class Graph {
     var nodes : [[GraphNode]] = []
     let numRowsCols: Int
+    var Q: [NodeLocation] = []
+    var OPEN: [NodeLocation] = []
+    
+    enum BFSState {
+        case Init
+        case Loop
+        case Done
+    }
+    var bfsState : BFSState = .Init
+    
+    enum AStarState {
+        case Init
+        case Loop
+        case Done
+    }
+    var aStarState : AStarState = .Init
     
     
     init(numRowsCols: Int) {
@@ -65,6 +84,11 @@ class Graph {
                 self[row, column].state.parentNode = nil
             }
         }
+        
+        Q.removeAll()
+        OPEN.removeAll()
+        bfsState = .Init
+        aStarState = .Init
     }
     
     /********** subscript **********/
@@ -94,7 +118,7 @@ class Graph {
     }
     
     func createInitialNodes(numRowsCols: Int) {
-        let defaultState = CellState(visitedState: .Unvisited, distance: Double.infinity, parentNode: nil)
+        let defaultState = CellState(visitedState: .Unvisited, distance: Double.infinity, g: 0.0, h: 0.0, gPath: [], parentNode: nil)
         let defaultNode = GraphNode(type: .Empty, state: defaultState)
         nodes = Array(count: numRowsCols, repeatedValue: Array(count: numRowsCols, repeatedValue: defaultNode))
     }
@@ -290,64 +314,98 @@ class Graph {
         return neighbors
     }
     
-    func executeBFS() {
-        let start = getStartCell()
-        var Q: [NodeLocation] = []
-        
-        self[start].state.distance = 0
-        self[start].state.parentNode = nil
-        self[start].state.visitedState = .InQueue
-        Q.append(start)
-        
-        mainLoop: while let node = Q.first {
-            if node == getEndCell() {
-                break mainLoop
+    func executeBFS() -> Bool {
+        switch(bfsState) {
+        case .Init:
+            let start = getStartCell()
+            
+            self[start].state.distance = 0
+            self[start].state.parentNode = nil
+            self[start].state.visitedState = .InQueue
+            Q.append(start)
+            
+            bfsState = .Loop
+            return false
+            
+        case .Loop:
+            if let node = Q.first {
+                if let adjNode = getAdjacentValidUnvisitedNeighbor(node) {
+                    self[adjNode].state.distance = self[node].state.distance + 1
+                    self[adjNode].state.parentNode = node
+                    self[adjNode].state.visitedState = .InQueue
+                    Q.append(adjNode)
+                    
+                    if adjNode == getEndCell() {
+                        bfsState = .Done
+                        return true
+                    }
+                }
+                else {
+                    self[node].state.visitedState = .Processed
+                    Q.removeFirst()
+                }
+                
+                return false
             }
             
-            if let adjNode = getAdjacentValidUnvisitedNeighbor(node) {
-                self[adjNode].state.distance = self[node].state.distance + 1
-                self[adjNode].state.parentNode = node
-                self[adjNode].state.visitedState = .InQueue
-                Q.append(adjNode)
-            }
-            else {
-                self[node].state.visitedState = .Processed
-                Q.removeFirst()
-            }
+            bfsState = .Done
+            return true
+            
+        case .Done:
+            return true
         }
     }
     
-    func executeDFS() {
-        let start = getStartCell()
-        var Q: [NodeLocation] = []
-        
-        self[start].state.distance = 0
-        self[start].state.parentNode = nil
-        self[start].state.visitedState = .InQueue
-        Q.insert(start, atIndex: 0)
-        
-        while let node = Q.first {
-            if node == getEndCell() {
-                break
+    func executeDFS() -> Bool {
+        switch(bfsState) {
+        case .Init:
+            let start = getStartCell()
+            
+            self[start].state.distance = 0
+            self[start].state.parentNode = nil
+            self[start].state.visitedState = .InQueue
+            Q.insert(start, atIndex: 0)
+            
+            bfsState = .Loop
+            return false
+            
+        case .Loop:
+            if let node = Q.first {
+                if let adjNode = getAdjacentValidUnvisitedNeighbor(node) {
+                    self[adjNode].state.distance = self[node].state.distance + 1
+                    self[adjNode].state.parentNode = node
+                    self[adjNode].state.visitedState = .InQueue
+                    Q.insert(adjNode, atIndex: 0)
+                    
+                    if adjNode == getEndCell() {
+                        bfsState = .Done
+                        return true
+                    }
+                }
+                else {
+                    self[node].state.visitedState = .Processed
+                    Q.removeFirst()
+                }
+                
+                return false
             }
             
-            if let adjNode = getAdjacentValidUnvisitedNeighbor(node) {
-                self[adjNode].state.distance = self[node].state.distance + 1
-                self[adjNode].state.parentNode = node
-                self[adjNode].state.visitedState = .InQueue
-                Q.insert(adjNode, atIndex: 0)
-            }
-            else {
-                self[node].state.visitedState = .Processed
-                Q.removeFirst()
-            }
+            bfsState = .Done
+            return true
+            
+        case .Done:
+            return true
         }
     }
     
-    func executeAStar() {
+    var thePathLength: Double = 0
+    func executeAStar() -> Bool {
         /* Shortest distance from s to x. */
         func G(node: NodeLocation) -> Double {
-            return Double(getPathLength(getPath(getStartCell(), endNode: node)))
+            self[node].state.gPath = getPath(getStartCell(), endNode: node)
+            let pathLength = Double(getPathLength(getPath(getStartCell(), endNode: node)))
+            thePathLength = pathLength
+            return pathLength
         }
         
         /* Straightline distance from x to goal. */
@@ -369,42 +427,67 @@ class Graph {
             return total
         }
         
-        let start = getStartCell()
-        var OPEN: [NodeLocation] = []
+        switch aStarState {
+        case .Init:
+            let start = getStartCell()
         
-        self[start].state.parentNode = nil
-        self[start].state.visitedState = .InQueue
-        self[start].state.distance = F(start)
-        OPEN.insert(start, atIndex: 0)
-        
-        while let node = OPEN.first {
-            if node == getEndCell() {
-                break
-            }
+            self[start].state.parentNode = nil
+            self[start].state.visitedState = .InQueue
+            self[start].state.distance = F(start)
+            OPEN.insert(start, atIndex: 0)
             
-            for adjNode in getAdjacentValidNeighbors(node) {
-                if self[adjNode].state.visitedState == .Unvisited {
-                    self[adjNode].state.parentNode = node
-                    self[adjNode].state.distance = G(node) + 1 + H(adjNode)
-                    OPEN.append(adjNode)
-                    OPEN.sortInPlace { (node1: NodeLocation, node2: NodeLocation) -> Bool in
-                        return self[node1].state.distance < self[node2].state.distance
-                    }
+            aStarState = .Loop
+            return false
+            
+        case .Loop:
+            
+            if let node = OPEN.first {
+                if node == getEndCell() {
+                    aStarState = .Done
+                    return true
                 }
-                else if self[adjNode].state.visitedState == .InQueue {
-                    if (G(node) + 1) < G(adjNode) {
+                
+                for adjNode in getAdjacentValidNeighbors(node) {
+                    if self[adjNode].state.visitedState == .Unvisited {
                         self[adjNode].state.parentNode = node
                         self[adjNode].state.distance = G(node) + 1 + H(adjNode)
+                        self[adjNode].state.visitedState = .InQueue
+                        self[adjNode].state.g = G(node)
+                        self[adjNode].state.h = H(adjNode)
+                        OPEN.append(adjNode)
                         OPEN.sortInPlace { (node1: NodeLocation, node2: NodeLocation) -> Bool in
                             return self[node1].state.distance < self[node2].state.distance
                         }
                     }
+                    else if self[adjNode].state.visitedState == .InQueue {
+                        if (G(node) + 1) < G(adjNode) {
+                            self[adjNode].state.parentNode = node
+                            self[adjNode].state.distance = G(node) + 1 + H(adjNode)
+                            self[adjNode].state.g = G(node)
+                            self[adjNode].state.h = H(adjNode)
+                            OPEN.sortInPlace { (node1: NodeLocation, node2: NodeLocation) -> Bool in
+                                return self[node1].state.distance < self[node2].state.distance
+                            }
+                        }
+                    }
                 }
+                OPEN = OPEN.filter { openNode in
+                    return !(openNode == node)
+                }
+                OPEN.sortInPlace { (node1: NodeLocation, node2: NodeLocation) -> Bool in
+                    return self[node1].state.distance < self[node2].state.distance
+                }
+                
+                self[node].state.visitedState = .Processed
+                
+                return false
             }
-            OPEN = OPEN.filter { openNode in
-                return !(openNode == node)
-            }
-            self[node].state.visitedState = .Processed
+            
+            aStarState = .Done
+            return true
+            
+        case .Done:
+            return true
         }
     }
 }
