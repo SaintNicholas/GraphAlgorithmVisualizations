@@ -44,7 +44,6 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         let done = functionToExecute()
         if done {
             timer.invalidate()
-            NSLog("true")
         }
         myCollectionView.reloadData()
     }
