@@ -27,9 +27,6 @@ enum CellType: String {
 struct CellState {
     var visitedState : CellVisitedState
     var distance : Double
-    var g: Double
-    var h: Double
-    var gPath: [NodeLocation] = []
     var parentNode : NodeLocation?
 }
 
@@ -118,7 +115,7 @@ class Graph {
     }
     
     func createInitialNodes(numRowsCols: Int) {
-        let defaultState = CellState(visitedState: .Unvisited, distance: Double.infinity, g: 0.0, h: 0.0, gPath: [], parentNode: nil)
+        let defaultState = CellState(visitedState: .Unvisited, distance: Double.infinity, parentNode: nil)
         let defaultNode = GraphNode(type: .Empty, state: defaultState)
         nodes = Array(count: numRowsCols, repeatedValue: Array(count: numRowsCols, repeatedValue: defaultNode))
     }
@@ -185,19 +182,7 @@ class Graph {
     func getSolutionPath() -> [NodeLocation] {
         return getPath(getStartCell(), endNode: getEndCell())
     }
-//    
-//    func getPathBackToStart(node: NodeLocation) -> [NodeLocation] {
-//        var path: [NodeLocation] = []
-//        
-//        var cell: NodeLocation? = node
-//        while let pathCell = cell {
-//            path.append(pathCell)
-//            cell = self[pathCell].state.parentNode
-//        }
-//        
-//        return path
-//    }
-    
+
     func getPath(startNode: NodeLocation, endNode: NodeLocation) -> [NodeLocation] {
         var path: [NodeLocation] = []
         
@@ -270,21 +255,37 @@ class Graph {
     
     func getAdjacentValidUnvisitedNeighbor(node: NodeLocation) -> NodeLocation? {
         let upNode: NodeLocation = NodeLocation(row: node.row - 1, column: node.column)
+        let upRightNode: NodeLocation = NodeLocation(row: node.row - 1, column: node.column + 1)
         let rightNode: NodeLocation = NodeLocation(row: node.row, column: node.column + 1)
+        let downRightNode: NodeLocation = NodeLocation(row: node.row + 1, column: node.column + 1)
         let downNode: NodeLocation = NodeLocation(row: node.row + 1, column: node.column)
+        let downLeftNode: NodeLocation = NodeLocation(row: node.row + 1, column: node.column - 1)
         let leftNode: NodeLocation = NodeLocation(row: node.row, column: node.column - 1)
+        let upLeftNode: NodeLocation = NodeLocation(row: node.row - 1, column: node.column - 1)
         
         if(isValidAndUnvisitedNode(upNode)) {
             return upNode
         }
+        if(isValidAndUnvisitedNode(upRightNode)) {
+            return upRightNode
+        }
         if(isValidAndUnvisitedNode(rightNode)) {
             return rightNode
+        }
+        if(isValidAndUnvisitedNode(downRightNode)) {
+            return downRightNode
         }
         if(isValidAndUnvisitedNode(downNode)) {
             return downNode
         }
+        if(isValidAndUnvisitedNode(downLeftNode)) {
+            return downLeftNode
+        }
         if(isValidAndUnvisitedNode(leftNode)) {
             return leftNode
+        }
+        if(isValidAndUnvisitedNode(upLeftNode)) {
+            return upLeftNode
         }
         
         return nil
@@ -294,21 +295,37 @@ class Graph {
         var neighbors: [NodeLocation] = []
         
         let upNode: NodeLocation = NodeLocation(row: node.row - 1, column: node.column)
+        let upRightNode: NodeLocation = NodeLocation(row: node.row - 1, column: node.column + 1)
         let rightNode: NodeLocation = NodeLocation(row: node.row, column: node.column + 1)
+        let downRightNode: NodeLocation = NodeLocation(row: node.row + 1, column: node.column + 1)
         let downNode: NodeLocation = NodeLocation(row: node.row + 1, column: node.column)
+        let downLeftNode: NodeLocation = NodeLocation(row: node.row + 1, column: node.column - 1)
         let leftNode: NodeLocation = NodeLocation(row: node.row, column: node.column - 1)
+        let upLeftNode: NodeLocation = NodeLocation(row: node.row - 1, column: node.column - 1)
         
-        if(isValidAndUnvisitedNode(upNode)) {
+        if(isValidNode(upNode)) {
             neighbors.append(upNode)
         }
-        if(isValidAndUnvisitedNode(rightNode)) {
+        if(isValidNode(upRightNode)) {
+            neighbors.append(upRightNode)
+        }
+        if(isValidNode(rightNode)) {
             neighbors.append(rightNode)
         }
-        if(isValidAndUnvisitedNode(downNode)) {
+        if(isValidNode(downRightNode)) {
+            neighbors.append(downRightNode)
+        }
+        if(isValidNode(downNode)) {
             neighbors.append(downNode)
         }
-        if(isValidAndUnvisitedNode(leftNode)) {
+        if(isValidNode(downLeftNode)) {
+            neighbors.append(downLeftNode)
+        }
+        if(isValidNode(leftNode)) {
             neighbors.append(leftNode)
+        }
+        if(isValidNode(upLeftNode)) {
+            neighbors.append(upLeftNode)
         }
         
         return neighbors
@@ -398,33 +415,48 @@ class Graph {
         }
     }
     
-    var thePathLength: Double = 0
     func executeAStar() -> Bool {
-        /* Shortest distance from s to x. */
+        /* Shortest distance from start to x. */
         func G(node: NodeLocation) -> Double {
-            self[node].state.gPath = getPath(getStartCell(), endNode: node)
             let pathLength = Double(getPathLength(getPath(getStartCell(), endNode: node)))
-            thePathLength = pathLength
             return pathLength
         }
         
         /* Straightline distance from x to goal. */
         func H(node: NodeLocation) -> Double {
             let endCell = getEndCell()
-            // This is as the bird flies, but it doesn't work well for not allowing diagonals?
-            //let distance = sqrt(pow(Double(endCell.row - node.row), 2.0) + pow(Double(endCell.column - node.column), 2.0))
-            
+
             // Manhattan distance
             let distance = abs(endCell.row - node.row) + abs(endCell.column - node.column)
             
             return Double(distance)
         }
         
+        /* Total distance from start to goal. */
         func F(node: NodeLocation) -> Double {
             let g = G(node)
             let h = H(node)
             let total = g + h
             return total
+        }
+        
+        /* Open needs to be ordered based on lowest path length. */
+        func addToOpen(node: NodeLocation) {
+            OPEN.append(node)
+            reorderOpen()
+        }
+        
+        func reorderOpen() {
+            OPEN.sortInPlace { (node1: NodeLocation, node2: NodeLocation) -> Bool in
+                return self[node1].state.distance < self[node2].state.distance
+            }
+        }
+        
+        func removeNodeFromOpen(node: NodeLocation) {
+            OPEN = OPEN.filter { openNode in
+                return !(openNode == node)
+            }
+            reorderOpen()
         }
         
         switch aStarState {
@@ -433,7 +465,6 @@ class Graph {
         
             self[start].state.parentNode = nil
             self[start].state.visitedState = .InQueue
-            self[start].state.distance = F(start)
             OPEN.insert(start, atIndex: 0)
             
             aStarState = .Loop
@@ -442,42 +473,28 @@ class Graph {
         case .Loop:
             
             if let node = OPEN.first {
-                if node == getEndCell() {
-                    aStarState = .Done
-                    return true
-                }
-                
                 for adjNode in getAdjacentValidNeighbors(node) {
+                    if node == getEndCell() {
+                        aStarState = .Done
+                        return true
+                    }
+                    
                     if self[adjNode].state.visitedState == .Unvisited {
                         self[adjNode].state.parentNode = node
                         self[adjNode].state.distance = G(node) + 1 + H(adjNode)
                         self[adjNode].state.visitedState = .InQueue
-                        self[adjNode].state.g = G(node)
-                        self[adjNode].state.h = H(adjNode)
-                        OPEN.append(adjNode)
-                        OPEN.sortInPlace { (node1: NodeLocation, node2: NodeLocation) -> Bool in
-                            return self[node1].state.distance < self[node2].state.distance
-                        }
+                        addToOpen(adjNode)
                     }
                     else if self[adjNode].state.visitedState == .InQueue {
-                        if (G(node) + 1) < G(adjNode) {
+                        if G(node) + 1 < G(adjNode) {
                             self[adjNode].state.parentNode = node
                             self[adjNode].state.distance = G(node) + 1 + H(adjNode)
-                            self[adjNode].state.g = G(node)
-                            self[adjNode].state.h = H(adjNode)
-                            OPEN.sortInPlace { (node1: NodeLocation, node2: NodeLocation) -> Bool in
-                                return self[node1].state.distance < self[node2].state.distance
-                            }
+                            reorderOpen()
                         }
                     }
                 }
-                OPEN = OPEN.filter { openNode in
-                    return !(openNode == node)
-                }
-                OPEN.sortInPlace { (node1: NodeLocation, node2: NodeLocation) -> Bool in
-                    return self[node1].state.distance < self[node2].state.distance
-                }
                 
+                removeNodeFromOpen(node)
                 self[node].state.visitedState = .Processed
                 
                 return false

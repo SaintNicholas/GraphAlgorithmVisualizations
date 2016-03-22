@@ -16,6 +16,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     @IBOutlet weak var mySearchTypePicker: StringPicker!
     
     var timer : NSTimer!
+    var functionToExecute : (() -> Bool)!
     
     @IBAction func resetButton(sender: UIButton) {
         timer.invalidate()
@@ -25,13 +26,22 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     }
     
     @IBAction func executeButton(sender: UIButton) {
+        switch(mySearchTypePicker.getSelectedPick()) {
+        case searchTypes.BFS.rawValue:
+            functionToExecute = myGraph.executeBFS
+        case searchTypes.DFS.rawValue:
+            functionToExecute = myGraph.executeDFS
+        default:
+            functionToExecute = myGraph.executeAStar
+        }
+        
         myCollectionView.userInteractionEnabled = false
         timer = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("execute"), userInfo: nil, repeats: true)
         timer.fire()
     }
     
     func execute() {
-        let done = myGraph.executeAStar()
+        let done = functionToExecute()
         if done {
             timer.invalidate()
             NSLog("true")
