@@ -14,6 +14,7 @@
 		9CD7ADCB1CA07CF500CCD5BD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9CD7ADC91CA07CF500CCD5BD /* LaunchScreen.storyboard */; };
 		9CD7ADD61CA07CF500CCD5BD /* GraphAlgorithmVisualizationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CD7ADD51CA07CF500CCD5BD /* GraphAlgorithmVisualizationsTests.swift */; };
 		9CD7ADE11CA07CF500CCD5BD /* GraphAlgorithmVisualizationsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CD7ADE01CA07CF500CCD5BD /* GraphAlgorithmVisualizationsUITests.swift */; };
+		9CFAE0841CA08242006C8845 /* Graph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFAE0831CA08242006C8845 /* Graph.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		9CD7ADDC1CA07CF500CCD5BD /* GraphAlgorithmVisualizationsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GraphAlgorithmVisualizationsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CD7ADE01CA07CF500CCD5BD /* GraphAlgorithmVisualizationsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphAlgorithmVisualizationsUITests.swift; sourceTree = "<group>"; };
 		9CD7ADE21CA07CF500CCD5BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9CFAE0831CA08242006C8845 /* Graph.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Graph.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +101,7 @@
 			children = (
 				9CD7ADC01CA07CF500CCD5BD /* AppDelegate.swift */,
 				9CD7ADC21CA07CF500CCD5BD /* ViewController.swift */,
+				9CFAE0831CA08242006C8845 /* Graph.swift */,
 				9CD7ADC41CA07CF500CCD5BD /* Main.storyboard */,
 				9CD7ADC71CA07CF500CCD5BD /* Assets.xcassets */,
 				9CD7ADC91CA07CF500CCD5BD /* LaunchScreen.storyboard */,
@@ -256,6 +259,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9CFAE0841CA08242006C8845 /* Graph.swift in Sources */,
 				9CD7ADC31CA07CF500CCD5BD /* ViewController.swift in Sources */,
 				9CD7ADC11CA07CF500CCD5BD /* AppDelegate.swift in Sources */,
 			);
@@ -484,6 +488,7 @@
 				9CD7ADE71CA07CF500CCD5BD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		9CD7ADE81CA07CF500CCD5BD /* Build configuration list for PBXNativeTarget "GraphAlgorithmVisualizationsTests" */ = {
 			isa = XCConfigurationList;
@@ -492,6 +497,7 @@
 				9CD7ADEA1CA07CF500CCD5BD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		9CD7ADEB1CA07CF500CCD5BD /* Build configuration list for PBXNativeTarget "GraphAlgorithmVisualizationsUITests" */ = {
 			isa = XCConfigurationList;
@@ -500,6 +506,7 @@
 				9CD7ADED1CA07CF500CCD5BD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
