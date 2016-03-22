@@ -51,10 +51,20 @@ class Graph {
     
     init(numRowsCols: Int) {
         self.numRowsCols = numRowsCols
-        resetNodeStates(numRowsCols)
+        createInitialNodes(numRowsCols)
 
         self[0, 0].type = .Start
         self[numRowsCols - 1, numRowsCols - 1].type = .End
+    }
+    
+    func resetCellStates() {
+        for row in 0..<numRowsCols {
+            for column in 0..<numRowsCols {
+                self[row, column].state.distance = Int.max
+                self[row, column].state.visitedState = .Unvisited
+                self[row, column].state.parentNode = nil
+            }
+        }
     }
     
     /********** subscript **********/
@@ -83,7 +93,7 @@ class Graph {
         }
     }
     
-    func resetNodeStates(numRowsCols: Int) {
+    func createInitialNodes(numRowsCols: Int) {
         let defaultState = CellState(visitedState: .Unvisited, distance: Int.max, parentNode: nil)
         let defaultNode = GraphNode(type: .Empty, state: defaultState)
         nodes = Array(count: numRowsCols, repeatedValue: Array(count: numRowsCols, repeatedValue: defaultNode))

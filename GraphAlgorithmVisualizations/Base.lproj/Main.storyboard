@@ -34,8 +34,8 @@
                                 </constraints>
                             </pickerView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dur-40-Fnl">
-                                <rect key="frame" x="20" y="570" width="46" height="30"/>
-                                <state key="normal" title="Button"/>
+                                <rect key="frame" x="20" y="570" width="48" height="30"/>
+                                <state key="normal" title="Search"/>
                                 <connections>
                                     <action selector="executeButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="aAG-ka-aUu"/>
                                 </connections>
@@ -63,16 +63,27 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="P6k-7S-Ask">
+                                <rect key="frame" x="20" y="540" width="39" height="30"/>
+                                <state key="normal" title="Reset"/>
+                                <connections>
+                                    <action selector="resetButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="FF7-oa-9Sj"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="Dur-40-Fnl" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="3JH-HF-vcl"/>
                             <constraint firstItem="Dur-40-Fnl" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="54y-1p-gaq"/>
+                            <constraint firstItem="P6k-7S-Ask" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="8JO-Vh-vW3"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="fVL-xb-qBl" secondAttribute="bottom" id="Dlb-XT-M4V"/>
                             <constraint firstItem="fVL-xb-qBl" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="E1m-BV-QhO"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="1qz-7j-YOA" secondAttribute="bottom" id="EJ9-AV-C2W"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Dur-40-Fnl" secondAttribute="bottom" id="Icc-MA-glY"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Dur-40-Fnl" secondAttribute="bottom" id="UvI-wc-8S6"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Iyf-Fp-MvT" secondAttribute="trailing" id="bpz-Nc-mt2"/>
                             <constraint firstItem="Iyf-Fp-MvT" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="jai-pq-t1D"/>
+                            <constraint firstItem="Dur-40-Fnl" firstAttribute="top" secondItem="P6k-7S-Ask" secondAttribute="bottom" id="pUV-ch-SwP"/>
                             <constraint firstItem="fVL-xb-qBl" firstAttribute="leading" secondItem="1qz-7j-YOA" secondAttribute="trailing" id="rye-9s-xPj"/>
                             <constraint firstItem="Iyf-Fp-MvT" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="xHE-Ho-M3m"/>
                         </constraints>

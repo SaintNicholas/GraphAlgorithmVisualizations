@@ -15,6 +15,12 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     @IBOutlet weak var myCellTypePicker: StringPicker!
     @IBOutlet weak var mySearchTypePicker: StringPicker!
     
+    @IBAction func resetButton(sender: UIButton) {
+        myGraph.resetCellStates()
+        myCollectionView.reloadData()
+        myCollectionView.userInteractionEnabled = true
+    }
+    
     @IBAction func executeButton(sender: UIButton) {
         myCollectionView.userInteractionEnabled = false
         myGraph.executeBFS()
