@@ -81,28 +81,56 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         return numRowsColumns
     }
     
+    func getFloatColorComponent(intComponent: UInt8) -> CGFloat {
+        return CGFloat(intComponent) / 255.0
+    }
+    
+    func makeUIColorFromIntComponents(red: UInt8, green: UInt8, blue: UInt8) -> UIColor {
+        return UIColor(red: getFloatColorComponent(red), green: getFloatColorComponent(green), blue: getFloatColorComponent(blue), alpha: 1.0)
+    }
+    
+    func backgroundGrayColor() -> UIColor {
+        return makeUIColorFromIntComponents(128, green: 128, blue: 128)
+    }
+    
+    func startColor() -> UIColor {
+        return makeUIColorFromIntComponents(33, green: 216, blue: 38)
+    }
+    
+    func endColor() -> UIColor {
+        return makeUIColorFromIntComponents(235, green: 69, blue: 27)
+    }
+    
+    func processedColor() -> UIColor {
+        return makeUIColorFromIntComponents(177, green: 237, blue: 237)
+    }
+    
+    func inQueueColor() -> UIColor {
+        return makeUIColorFromIntComponents(155, green: 250, blue: 155)
+    }
+    
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("cell", forIndexPath: indexPath)
         cell.layer.borderWidth = 1
-        cell.layer.borderColor = UIColor.grayColor().CGColor
+        cell.layer.borderColor = backgroundGrayColor().CGColor
 
         let nodeLocation = NodeLocation(row: indexPath.section, column: indexPath.row)
         switch(myGraph.cellType(nodeLocation)) {
         case .Wall:
-            cell.backgroundColor = UIColor.grayColor()
+            cell.backgroundColor = backgroundGrayColor()
         case .Start:
-            cell.backgroundColor = UIColor.greenColor()
+            cell.backgroundColor = startColor()
         case .End:
-            cell.backgroundColor = UIColor.redColor()
+            cell.backgroundColor = endColor()
         default:
             if myGraph.getSolutionPath().contains(nodeLocation) {
-                cell.backgroundColor = UIColor.purpleColor()
+                cell.backgroundColor = UIColor.yellowColor()
             }
             else if myGraph.nodeProcessed(nodeLocation) {
-                cell.backgroundColor = UIColor.blueColor()
+                cell.backgroundColor = processedColor()
             }
             else if myGraph.nodeInQueue(nodeLocation) {
-                cell.backgroundColor = UIColor.yellowColor()
+                cell.backgroundColor = inQueueColor()
             }
             else {
                 cell.backgroundColor = UIColor.whiteColor()
